@@ -12,16 +12,14 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please gain inspiration from the following random code snippet to create high-quality solution code of a programming problem.
+    instruction = f'''Please gain inspiration from the following random code snippet to create complete high-quality solution code of a programming problem.
 
 Code snippet for inspiration:
 ```
 {code}
 ```
-
-Solution code:
 '''
-    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="")
+    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```")
     return prompt
 
 def generate_prompts(input_path):
@@ -58,6 +56,9 @@ def sample(llm, sampling_params, prompts, save_path):
             response = x.outputs[0].text
             # response = extract_code(response)
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
+            response = '```' + response
+            # print(prompt)
+            # print(response)
             data = {'instruction': prompt, 'response': response}
             writer.write(data)
 
