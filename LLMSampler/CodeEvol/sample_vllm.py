@@ -12,10 +12,16 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please give a completely new code snippet in the same domain of the following code snippet with more complex and different application:
-{code}'''
-    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```\n")
-    prompt =  '[INST]' + prompt + '[/INST]'
+    instruction = f'''Please gain inspiration from the following random code snippet to create high-quality solution code of a programming problem.
+
+Code snippet for inspiration:
+```
+{code}
+```
+
+Solution code:
+'''
+    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="")
     return prompt
 
 def generate_prompts(input_path):
@@ -23,7 +29,7 @@ def generate_prompts(input_path):
     with open(input_path, 'r') as f:
         for line in f.readlines():
             line = eval(line)
-            code = line['response']
+            code = line['seed']
             prompts.append(generate_one_prompt(code))
     return prompts
 
@@ -52,8 +58,6 @@ def sample(llm, sampling_params, prompts, save_path):
             response = x.outputs[0].text
             # response = extract_code(response)
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
-            # print(prompt)
-            # print(response)
             data = {'instruction': prompt, 'response': response}
             writer.write(data)
 
@@ -87,7 +91,7 @@ def main(
         prompts = []
         for line in f.readlines():
             line = eval(line)
-            code = line['response']
+            code = line['seed']
             # code = extract_code(code)
             prompts.append(generate_one_prompt(code))
             if len(prompts) == batch_size:
