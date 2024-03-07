@@ -2,21 +2,17 @@ from vllm import LLM, SamplingParams
 import fire
 import jsonlines
 
-MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
-
-@@ Instruction
-{instruction}
+MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable instructions to user responses.
 
 @@ Response
-{response}"""
+{response}
+
+@@ Instruction
+{instruction}"""
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please briefly summarize the purpose of the following code:
-{code}
-'''
-    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="")
-    prompt =  '[INST]' + prompt + '[/INST]'
+    prompt =  MAGICODER_PROMPT.format(instruction="Write a solution to the following problem:", response=code)
     return prompt
 
 def generate_prompts(input_path):
@@ -54,8 +50,8 @@ def sample(llm, sampling_params, prompts, save_path):
             response = x.outputs[0].text
             # response = extract_code(response)
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
-            print(prompt)
-            print(response)
+            # print(prompt)
+            # print(response)
             data = {'instruction': prompt, 'response': response}
             writer.write(data)
 
