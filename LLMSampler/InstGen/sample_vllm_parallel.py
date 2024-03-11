@@ -62,6 +62,7 @@ def extract_code(content: str):
 def sample(llm, sampling_params, prompts, save_path):
     # Generate response in parallel and save in the target file.
     outputs = llm.generate(prompts, sampling_params, use_tqdm=False)
+    results = []
     with jsonlines.open(save_path, mode='a') as writer:
         for x in outputs:
             prompt = x.prompt.encode('utf-8', 'backslashreplace').decode('utf-8')
@@ -72,6 +73,8 @@ def sample(llm, sampling_params, prompts, save_path):
             # print(response)
             data = {'instruction': prompt, 'response': response}
             writer.write(data)
+            results.append(data)
+    return results
 
 def main(
     input_lines: List[str],
@@ -107,22 +110,24 @@ def main(
     
     def generate_with_timer(prompts):
         start_time = time.perf_counter()
-        sample(llm, sampling_params, prompts, save_path)
+        results = sample(llm, sampling_params, prompts, save_path)
         end_time = time.perf_counter()
         print(f'[Parallel] pid: {pid}, generated data: {len(prompts)}, time: {end_time - start_time}s')
-
+        return results
 
     prompts = []
+    results = []
     for line in input_lines:
         line = eval(line)
         code = line['response']
         # code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
-            generate_with_timer(prompts)
+            results.extend(generate_with_timer(prompts))
             prompts = []
     if prompts:
-        generate_with_timer(prompts)
+        results.extend(generate_with_timer(prompts))
+    return results
 
 if __name__ == '__main__':
 
@@ -144,5 +149,9 @@ if __name__ == '__main__':
 
     lock = Lock()
     with Pool(num_processes) as p:
-        p.map(partial(main, model_path=args.model_path, save_path=args.save_path), data_chunks)
+        results = p.map(partial(main, model_path=args.model_path, save_path=args.save_path), data_chunks)
+        
+    with jsonlines.open(save_path, mode='a') as writer:
+        for data in results:
+            writer.write(data)
 
