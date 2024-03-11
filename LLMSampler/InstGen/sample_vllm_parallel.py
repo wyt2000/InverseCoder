@@ -29,7 +29,7 @@ There is a response code snippet to a programming problem, please recover the pr
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    prompt =  MAGICODER_PROMPT.format(instruction="", response='```\n' + code)
+    prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
     # prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Write a solution to the following problem:", response=code)
     return prompt
 
@@ -151,7 +151,8 @@ if __name__ == '__main__':
     with Pool(num_processes) as p:
         results = p.map(partial(main, model_path=args.model_path, save_path=args.save_path), data_chunks)
         
-    with jsonlines.open(save_path, mode='a') as writer:
-        for data in results:
-            writer.write(data)
+    with jsonlines.open(args.save_path, mode='a') as writer:
+        for result in results:
+            for data in result:
+                writer.write(data)
 
