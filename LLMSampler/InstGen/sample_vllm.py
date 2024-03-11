@@ -2,13 +2,12 @@ from vllm import LLM, SamplingParams
 import fire
 import jsonlines
 
-MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
-
-@@ Instruction
-There is a response code snippet to a programming problem, please recover the problem:
-{response}
+MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable instructions to user responses.
 
 @@ Response
+{response}
+
+@@ Instruction
 {instruction}"""
 
 MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
