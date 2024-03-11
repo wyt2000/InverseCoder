@@ -21,7 +21,7 @@ There is a response code snippet to a programming problem, please recover the pr
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
+    prompt =  MAGICODER_PROMPT.format(instruction="", response='```\n' + code)
     # prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Write a solution to the following problem:", response=code)
     return prompt
 
