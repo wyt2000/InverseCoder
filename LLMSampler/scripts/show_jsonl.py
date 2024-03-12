@@ -1,4 +1,4 @@
-with open('magicoder_data/oss-instruct-codevol-0306-summary-3200.jsonl') as f:
+with open('magicoder_data/codevol-wizardcoder-gpt4-prompt-modified-1-0312.jsonl.1') as f:
 	for line in list(f.readlines())[:10]:
 		line = eval(line)
 		print(line['instruction'])

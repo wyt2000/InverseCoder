@@ -10,22 +10,13 @@ import fire
 import jsonlines
 import time
 
-MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable instructions to user responses.
-
-@@ Response
-{response}
+MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
 
 @@ Instruction
-{instruction}"""
-
-MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
-
-@@ Instruction
-There is a response code snippet to a programming problem, please recover the problem:
-{response}
+{instruction}
 
 @@ Response
-{instruction}"""
+{response}"""
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
@@ -75,7 +66,7 @@ def sample(llm, sampling_params, prompts, save_path):
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
             # print(prompt)
             # print(response)
-            data = {'instruction': prompt, 'response': response}
+            data = {'instruction': prompt, 'response': '```' + response}
             writer.write(data)
             results.append(data)
     return results
