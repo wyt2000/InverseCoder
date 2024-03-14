@@ -23,7 +23,9 @@ def generate_one_prompt(code):
     instruction = f'''Please gain inspiration from the following random text snippet to create complete high-quality solution code of a programming problem.
 
 Text snippet for inspiration:
+```
 {code}
+```
 '''
     prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```")
     return prompt
