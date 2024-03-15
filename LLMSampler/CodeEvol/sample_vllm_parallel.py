@@ -35,7 +35,7 @@ def generate_prompts(input_path):
     with open(input_path, 'r') as f:
         for line in f.readlines():
             line = eval(line)
-            code = line['response']
+            code = line['raw_code']
             prompts.append(generate_one_prompt(code))
     return prompts
 
@@ -116,7 +116,7 @@ def main(
     results = []
     for line in input_lines:
         line = eval(line)
-        code = line['response']
+        code = line['raw_code']
         # code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
