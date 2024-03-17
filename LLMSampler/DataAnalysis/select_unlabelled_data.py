@@ -18,7 +18,7 @@ def get_token_length(tokenizer, sequence):
 
 max_token_length = 800
 min_token_length = 50
-save_path = 'magicoder_data/starcoderdata_cleaned.jsonl'
+save_path = 'magicoder_data/starcoderdata_cleaned_with_stars.jsonl'
 with jsonlines.open(save_path, mode='w') as writer:
     with tqdm.tqdm(total=len(dataset)) as pbar:
         for i, x in enumerate(dataset):
@@ -27,6 +27,6 @@ with jsonlines.open(save_path, mode='w') as writer:
                 code = '\n'.join(code.splitlines()[1:])
             token_length = get_token_length(tokenizer, code)
             if min_token_length <= token_length <= max_token_length:
-                data = {'raw_code': code.encode('utf-8', 'backslashreplace').decode('utf-8')}
+                data = {'raw_code': code.encode('utf-8', 'backslashreplace').decode('utf-8'), 'stars': x['max_stars_count']}
                 writer.write(data)
             pbar.update(1)
