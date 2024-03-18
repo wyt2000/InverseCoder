@@ -1,3 +1,5 @@
-with open('starcoderdata-python-jsonl/starcoderdata-python-sorted.jsonl') as f:
-    for i in range(10):
-        f.readline()
+with open('magicoder_data/starcoderdata-python-topstar-evol.jsonl.1') as f:
+	for line in list(f.readlines())[:10]:
+		line = eval(line)
+		print(line['instruction'])
+		print(line['response'])
