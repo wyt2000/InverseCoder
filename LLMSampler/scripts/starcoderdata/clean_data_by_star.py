@@ -1,14 +1,27 @@
 import jsonlines
+import tqdm
+from collections import Counter
 
-with open('magicoder_data/starcoderdata_cleaned_with_stars.jsonl') as f:
-    data_with_stars = list(f.readlines())
+num_data = 300000
 
-with open('magicoder_data/starcoderdata_evol_by_wizardcoder_gpt4_0314.jsonl') as f:
-    data_with_evol = list(f.readlines())
+repo_cnt = Counter()
+dataset = []
+with tqdm.tqdm(total=num_data) as pbar:
+    with open('starcoderdata-python-jsonl/starcoderdata-python-sorted.jsonl') as f:
+        while True:
+            if len(dataset) == num_data: break
+            line = f.readline()
+            if not line: break
+            line = eval(line)
+            repo_name = line['max_stars_repo_name'].split('/')[-1]
+            stars = line['max_stars_count']
+            if repo_cnt[(repo_name, stars)] >= 3: continue
+            dataset.append(line)
+            repo_cnt[(repo_name, stars)] += 1
+            pbar.update(1)
 
-with jsonlines.open('magicoder_data/starcoderdata_evol_by_wizardcoder_gpt4_0314_filtered_by_stars_100.jsonl', mode='w') as writer:
-    for star_data, evol_data in zip(data_with_stars, data_with_evol):
-        star_data = eval(star_data)
-        evol_data = eval(evol_data)
-        if star_data['stars'] >= 100:
-            writer.write(evol_data)
+with tqdm.tqdm(total=num_data) as pbar:
+    with jsonlines.open('starcoderdata-python-jsonl/starcoderdata-python-top300k.jsonl', mode='w') as writer:
+        for data in dataset:
+            writer.write(data)
+            pbar.update(1)
