@@ -27,7 +27,8 @@ def generate_one_prompt(code):
 #{code}
 #```
 #'''
-    instruction = f'''Please add docstrings for all functions in the given code snippet while keeping the function implementation unchanged:
+    instruction = f'''Please add detailed comments for each function of the given code snippet.
+Code snippet to add docstrings:
 ```
 {code}
 ```
@@ -83,14 +84,14 @@ def main(
     model_path: str,
     save_path: str,
     num_samples: int = 1,
-    temperature: int = 0.8,
+    temperature: int = 0.0,
     presence_penalty: float = 0.0,
     frequency_penalty: float = 0.0,
     repetition_penalty: float = 1.1,
     use_beam_search: bool = False,
     best_of: int = 1,
     max_tokens: int = 2048,
-    batch_size: int = 512
+    batch_size: int = 256
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
