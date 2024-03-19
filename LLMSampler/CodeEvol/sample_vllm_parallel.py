@@ -20,9 +20,14 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please gain inspiration from the following random text snippet to create complete high-quality solution code of a programming problem.
-
-Text snippet for inspiration:
+#    instruction = f'''Please gain inspiration from the following random text snippet #to create complete high-quality solution code of a programming problem.
+#
+#Text snippet for inspiration:
+#```
+#{code}
+#```
+#'''
+    instruction = f'''Please add docstrings for all functions in the given code snippet while keeping the function implementation unchanged:
 ```
 {code}
 ```
@@ -35,7 +40,7 @@ def generate_prompts(input_path):
     with open(input_path, 'r') as f:
         for line in f.readlines():
             line = eval(line)
-            code = line['content']
+            code = line['raw_code']
             prompts.append(generate_one_prompt(code))
     return prompts
 
@@ -116,7 +121,7 @@ def main(
     results = []
     for line in input_lines:
         line = eval(line)
-        code = line['content']
+        code = line['raw_code']
         # code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
