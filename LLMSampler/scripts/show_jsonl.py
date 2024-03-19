@@ -1,5 +1,7 @@
-with open('magicoder_data/starcoderdata-python-topstar-evol.jsonl.1') as f:
-	for line in list(f.readlines())[:10]:
-		line = eval(line)
-		print(line['instruction'])
-		print(line['response'])
+with open('magicoder_data/starcoderdata_cleaned_0314_instructed_by_docstring_0319.jsonl') as f:
+    for line in list(f.readlines())[10:20]:
+        line = eval(line)
+        print('@@instr')
+        print(line['instruction'])
+        print('@@resp')
+        print(line['response'])

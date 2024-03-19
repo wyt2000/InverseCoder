@@ -1,43 +1,6 @@
-import ast_comments as ast 
-
-testcase = '''
-# First question related code:
-"""
-This function calculates whether a number is a perfect cube or not.
-The number to be checked is taken as a command-line argument.
-If it's a perfect cube, then it returns True otherwise False.
-"""
-def perfect_cube(n):
-    """
-    Here is a docstring.
-    """
-    i = n // 100
-    j = n // 10 % 10
-    k = n % 10
-    return n == i ** 3 + j ** 3 + k ** 3 
-
-# The following code checks if the numbers between 400 and 500 are perfect cubes.
-for n in range(400,500):
-    if perfect_cube(n):
-       print(n)
-
-
-# Second question related code:
-"""
-This function takes a string of space separated digits and appends only those which 
-are divisible by 6 into another list. It also prints these numbers.
-"""
-def divisible_by_six(s):
-    l2 = []
-    for i in s.split(' '):
-        if i.isdigit() and int(i) % 6 == 0:
-            l2.append(int(i))
-    for i in l2:
-        print(i, end=" ")
-
-# To use it
-divisible_by_six(input("Enter a list of integers separated by spaces: "))
-'''
+import ast_comments as ast
+import jsonlines
+import tqdm
 
 class RemoveFuncImplTransformer(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
@@ -59,9 +22,61 @@ def unparse(ast_node):
    u = Unparser()
    return u.visit(ast_node)
 
-root = ast.parse(testcase)
-visitor = RemoveFuncImplTransformer()
-visitor.visit(root)
-code = unparse(root)
-print(testcase)
-print(code)
+def clean_code(code):
+    root = ast.parse(code)
+    return unparse(root)
+
+def remove_impl(code):
+    root = ast.parse(code)
+    visitor = RemoveFuncImplTransformer()
+    visitor.visit(root)
+    return unparse(root)
+
+def extract_code(code: str):
+    if not '```' in code:
+        return code
+    start = code.find('```')
+    end = code.rfind('```')
+    ret = code[start:end]
+    ret = '\n'.join(ret.splitlines()[1:])
+    if not ret:
+        ret = code[start:]
+        ret = '\n'.join(ret.splitlines()[1:])
+    return ret
+
+code_templete = '''```python
+{code}
+```'''
+prompt_templete = '''Please complete the code:
+{prompt}'''
+
+dataset = []
+with open('magicoder_data/starcoderdata_cleaned_0314_with_docstring.jsonl') as f:
+    lines = list(f.readlines())
+    with tqdm.tqdm(total=len(lines)) as pbar:
+        for line in lines:
+            line = eval(line)
+            code = extract_code(line['response'])
+            try:
+                if not code:
+                    print(line['response'])
+                    raise ValueError('Empty code!')
+                prompt = remove_impl(code)
+                prompt = code_templete.format(code=prompt)
+                prompt = prompt_templete.format(prompt=prompt)
+                code = clean_code(code)
+                data = {'instruction': prompt, 'response': code_templete.format(code=code)}
+                dataset.append(data)
+            except Exception as err:
+                #print(line['response'])
+                #print(code)
+                #print(err)
+                pass
+            finally:
+                pbar.update(1)
+
+with jsonlines.open('magicoder_data/starcoderdata_cleaned_0314_instructed_by_docstring_0319.jsonl', mode='w') as writer:
+    for data in dataset:
+        writer.write(data)
+
+
