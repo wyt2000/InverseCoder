@@ -91,7 +91,7 @@ def main(
     use_beam_search: bool = False,
     best_of: int = 1,
     max_tokens: int = 2048,
-    batch_size: int = 256
+    batch_size: int = 512
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
