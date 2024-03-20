@@ -33,7 +33,7 @@ with jsonlines.open('magicoder_data/oss-instruct-codevol-0306-problem-prompt-ins
         if check(no_prompt_line['instruction'], no_prompt_line['response']):
             writer.write(problem_prompt_line)
         else:
-            removed_data.append(problem_prompt_line)
+            removed_data.append(no_prompt_line)
 
 with jsonlines.open('magicoder_data/oss-instruct-codevol-0306-problem-prompt-instruction-data-cleaned-removed.jsonl', mode='w') as writer:
     for line in removed_data:
