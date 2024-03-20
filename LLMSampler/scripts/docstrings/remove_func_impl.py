@@ -8,7 +8,7 @@ class RemoveFuncImplTransformer(ast.NodeTransformer):
         super().__init__()
         self.cnt = 0
     def visit_FunctionDef(self, node):
-        doc = ast.get_docstring(node)
+        doc = ast.get_docstring(node, clean=False)
         if node.body and isinstance(node.body[0], ast.Comment):
             node.body = [node.body[0]]
         else:
@@ -25,7 +25,7 @@ class RemoveClassImplTransformer(ast.NodeTransformer):
         super().__init__()
         self.cnt = 0
     def visit_ClassDef(self, node):
-        doc = ast.get_docstring(node)
+        doc = ast.get_docstring(node, clean=False)
         node.body = []
         if doc:
             node.body.append(ast.Expr(value=ast.Str(doc)))
@@ -96,6 +96,33 @@ class Unparser(ast._Unparser):
         with self.block(extra=self.get_type_comment(node)):
             self._write_docstring_and_traverse_body(node)
 
+    def visit_ClassDef(self, node):
+        self.newline_except_comment()
+        for deco in node.decorator_list:
+            self.fill("@")
+            self.traverse(deco)
+        self.fill("class " + node.name)
+        if hasattr(node, "type_params"):
+            self._type_params_helper(node.type_params)
+        with self.delimit_if("(", ")", condition = node.bases or node.keywords):
+            comma = False
+            for e in node.bases:
+                if comma:
+                    self.write(", ")
+                else:
+                    comma = True
+                self.traverse(e)
+            for e in node.keywords:
+                if comma:
+                    self.write(", ")
+                else:
+                    comma = True
+                self.traverse(e)
+
+        with self.block():
+            self._write_docstring_and_traverse_body(node)
+
+
 def unparse(ast_node):
    u = Unparser()
    return u.visit(ast_node)
@@ -116,7 +143,10 @@ def remove_impl(code):
         return unparse(root)
     visitor = CommentCollectVisitor()
     visitor.visit(root)
-    root.body = visitor.comments
+    doc = ast.get_docstring(root, clean=False)
+    if doc: root.body = [ast.Expr(value=ast.Str(doc))]
+    else: root.body = []
+    root.body.extend(visitor.comments)
     return unparse(root)
 
 def extract_code(code: str):
