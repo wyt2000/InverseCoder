@@ -1,5 +1,5 @@
-with open('magicoder_data/oss-instruct-codevol-0306-problem-prompt-instruction-data-cleaned-removed.jsonl') as f:
-    for line in list(f.readlines())[:1]:
+with open('magicoder_data/data-evol_instruct-decontaminated.jsonl.python') as f:
+    for line in list(f.readlines())[10:20]:
         line = eval(line)
         print('@@instr')
         print(line['instruction'])
