@@ -22,15 +22,17 @@ MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assis
 
 @@ Instruction
 There is a response code snippet to a programming problem, please recover the problem:
+```python
 {response}
+```
 
 @@ Response
 {instruction}"""
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
-    # prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Write a solution to the following problem:", response=code)
+    # prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
+    prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Problem Statement:\n", response=code)
     return prompt
 
 def generate_prompts(input_path):
@@ -42,22 +44,17 @@ def generate_prompts(input_path):
             prompts.append(generate_one_prompt(code))
     return prompts
 
-def extract_code(content: str):
-    if not '```' in content:
-        return content
-    content = content.lstrip('```')
-    code = []
-    is_target = False
-    for line in content.splitlines():
-        if '```' in line:
-            if is_target:
-                break
-            else:
-                is_target = True
-                continue
-        if is_target:
-            code.append(line)
-    return '\n'.join(code)
+def extract_code(code: str):
+    if not '```' in code:
+        return code
+    start = code.find('```')
+    end = code.rfind('```')
+    ret = code[start:end]
+    ret = '\n'.join(ret.splitlines()[1:])
+    if not ret:
+        ret = code[start:]
+        ret = '\n'.join(ret.splitlines()[1:])
+    return ret
 
 def sample(llm, sampling_params, prompts, save_path):
     # Generate response in parallel and save in the target file.
@@ -88,7 +85,7 @@ def main(
     use_beam_search: bool = False,
     best_of: int = 1,
     max_tokens: int = 2048,
-    batch_size: int = 512
+    batch_size: int = 16
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
@@ -120,7 +117,7 @@ def main(
     for line in input_lines:
         line = eval(line)
         code = line['response']
-        # code = extract_code(code)
+        code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
             results.extend(generate_with_timer(prompts))

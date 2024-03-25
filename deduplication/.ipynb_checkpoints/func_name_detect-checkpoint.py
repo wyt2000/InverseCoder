@@ -44,9 +44,9 @@ def extract_code(code: str):
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl'
+data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.fixed.python.instruct-0324'
 fixed_dataset = []
-with jsonlines.open(f'{data_path}.python_and_duplicated', mode='w') as writer:
+with jsonlines.open(f'{data_path}.duplicated', mode='w') as writer:
     with open(data_path) as f:
         dataset = list(f.readlines())
         with tqdm.tqdm(total=len(dataset)) as pbar:
@@ -59,7 +59,8 @@ with jsonlines.open(f'{data_path}.python_and_duplicated', mode='w') as writer:
                 inst = line['instruction']
                 resp = line['response']
                 for name in func_names.keys():
-                    pattern = f'def {name}('
+                    # pattern = f'def {name}('
+                    pattern = f'def {name}'
                     if pattern in inst or pattern in resp:
                         writer.write(data)
                         func_names[name] += 1
@@ -69,8 +70,8 @@ with jsonlines.open(f'{data_path}.python_and_duplicated', mode='w') as writer:
                     try:
                         if not code:
                             raise ValueError('Empty code!')
-                        ast.parse(code)
-                        writer.write(data)
+                        # ast.parse(code)
+                        # writer.write(data)
                     except Exception as err:
                         #print(line['response'])
                         #print(code)

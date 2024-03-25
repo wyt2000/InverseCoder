@@ -1,6 +1,10 @@
-with open('magicoder_data/data-evol_instruct-decontaminated.jsonl.python') as f:
-    for line in list(f.readlines())[10:20]:
+# input_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.fixed.python.instruct-0324'
+input_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.fixed.python'
+
+with open(input_path) as f:
+    for line in list(f.readlines()):
         line = eval(line)
+        if 'check_prime' not in line['response']: continue
         print('@@instr')
         print(line['instruction'])
         print('@@resp')
