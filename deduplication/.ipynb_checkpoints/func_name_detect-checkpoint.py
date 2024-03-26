@@ -44,7 +44,7 @@ def extract_code(code: str):
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.fixed.no_python.evol-0325'
+data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl'
 fixed_dataset = []
 with jsonlines.open(f'{data_path}.python', mode='w') as writer:
     with open(data_path) as f:
