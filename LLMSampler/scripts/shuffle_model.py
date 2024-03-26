@@ -268,7 +268,7 @@ def get_smaller_llama2(hidden_size : int = 2048,
                        return_tokenizer: bool = False, 
                        verbose : bool = False,
                        ):
-    config = AutoConfig.from_pretrained("./CodeLlama-7b-Python-hf/")
+    config = AutoConfig.from_pretrained("/lustre/models/CodeLlama_240112/codellama-CodeLlama-7b-hf/")
     # config.hidden_size = hidden_size
     # config.num_hidden_layers = num_hidden_layers
     smaller_model = AutoModelForCausalLM.from_config(config)
@@ -342,7 +342,7 @@ export CUDA_VISIBLE_DEVICES=6
     print(f"Total weight norm (after): {total_weight_norm_after_reinit=}")
     assert total_weight_norm_before_reinit != total_weight_norm_after_reinit, f'Error: total_weight_norm_reinit == total_weight_norm' 
     assert total_weight_norm_before_reinit > total_weight_norm_after_reinit, f'Error norm before reinit < norm after reinit (should be smaller after reinit).'
-    torch.save(model.state_dict(), 'CodeLlama-7b-Python-hf-reinit/pytorch_model.bin')
+    torch.save(model.state_dict(), '/lustre/S/wuyt/model/CodeLlama-7b-hf-reinit/pytorch_model.bin')
 
 
 if __name__ == '__main__':
