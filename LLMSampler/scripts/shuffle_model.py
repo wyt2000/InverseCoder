@@ -37,7 +37,6 @@ import torch
 from transformers import GPT2LMHeadModel, PreTrainedTokenizer, AutoTokenizer, Trainer, TrainingArguments, AutoConfig
 # from transformers import models.llama.modeling_llama.LlamaRMSNorm as LlamaRMSNorm
 import math
-import wandb
 import os
 
 def num_params(model: nn.Module) -> int:

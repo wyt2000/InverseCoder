@@ -66,7 +66,7 @@ def sample(llm, sampling_params, prompts, save_path):
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
             # print(prompt)
             # print(response)
-            data = {'instruction': prompt, 'response': '```python\n' +  response+'\n```'}
+            data = {'instruction': prompt, 'response': '```python\n' +  response.strip() + '\n```'}
             writer.write(data)
             results.append(data)
     return results
