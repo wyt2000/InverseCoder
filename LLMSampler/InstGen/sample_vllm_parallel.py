@@ -22,9 +22,7 @@ MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assis
 
 @@ Instruction
 There is a response code snippet to a programming problem, please recover the problem:
-```python
 {response}
-```
 
 @@ Response
 {instruction}"""
@@ -119,7 +117,7 @@ def main(
     for line in input_lines:
         line = eval(line)
         code = line['response']
-        code = extract_code(code)
+        # code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
             results.extend(generate_with_timer(prompts))

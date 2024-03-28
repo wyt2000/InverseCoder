@@ -20,7 +20,7 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please convert the following text snippet to a complete python code snippet.
+    instruction = f'''Please convert the following text snippet to a complete python code snippet:
 
 Text snippet for inspiration:
 {code}
@@ -84,7 +84,7 @@ def main(
     best_of: int = 1,
     max_tokens: int = 2048,
     stop: List[str] = ['```'],
-    batch_size: int = 16
+    batch_size: int = 512
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
