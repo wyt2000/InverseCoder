@@ -2,7 +2,7 @@ import tqdm
 import jsonlines
 import ast
 dataset = []
-with open('magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.all.instruct.0326.shuffled') as f:
+with open('dataset/data-evol_instruct-decontaminated.jsonl.no_python.all.instruct.0326.shuffled') as f:
     for line in f.readlines():
         line = eval(line)
         dataset.append(line)
@@ -51,7 +51,9 @@ with tqdm.tqdm(total=len(dataset)) as pbar:
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-with jsonlines.open('magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.all.instruct.0326.shuffled.deduplicated', mode='w') as writer:
+print(len(deduplicated_dataset))
+with jsonlines.open('dataset/data-evol_instruct-decontaminated.jsonl.no_python.all.instruct.0326.shuffled.deduplicated', mode='w') as writer:
     for data in deduplicated_dataset:
         data['instruction'] = redecode(data['instruction'])
         data['response'] = redecode(data['response'])
+        writer.write(data)
