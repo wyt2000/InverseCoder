@@ -24,6 +24,9 @@ def eval_program(code: str, timeout: float = 3.0):
         except Exception as err:
             print(err)
             exc = err
+        except SystemExit as err:
+            print(err)
+            exc = err
         finally:
             sys.setrecursionlimit(recursion_limit)
             resource.setrlimit(resource.RLIMIT_AS, (soft, hard))

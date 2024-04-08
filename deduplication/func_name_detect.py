@@ -47,7 +47,7 @@ def extract_code(code: str):
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327.instruct'
+data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327'
 fixed_dataset = []
 with jsonlines.open(f'{data_path}.syntax.valid', mode='w') as writer:
     with open(data_path) as f:
@@ -68,10 +68,10 @@ with jsonlines.open(f'{data_path}.syntax.valid', mode='w') as writer:
                     ast.parse(code)
                     exc = eval_program(code)
                     if exc:
-                        raise exc
+                        raise Exception('Runtime Error!')
                     writer.write(data)
                 except Exception as err:
-                    fixed_dataset.append(data)                    
+                    fixed_dataset.append(data)
                 pbar.update(1)
 with jsonlines.open(f'{data_path}.syntax.invalid', mode='w') as writer:
     for data in fixed_dataset:
