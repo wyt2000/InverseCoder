@@ -9,23 +9,29 @@ from vllm import LLM, SamplingParams
 import fire
 import jsonlines
 import time
+import json
 
-MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
-
-@@ Instruction
-{instruction}
+MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable instructions to user responses.
 
 @@ Response
-{response}"""
+{response}
+
+@@ Instruction
+{instruction}"""
+
+MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
+
+@@ Instruction
+There is a response code snippet to a programming problem, please recover the problem:
+{response}
+
+@@ Response
+{instruction}"""
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please convert the following text snippet to a complete python code snippet:
-
-Text snippet for inspiration:
-{code}
-'''
-    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```python\n")
+    # prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
+    prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Problem Statement:\n", response=code)
     return prompt
 
 def generate_prompts(input_path):
@@ -37,22 +43,17 @@ def generate_prompts(input_path):
             prompts.append(generate_one_prompt(code))
     return prompts
 
-def extract_code(content: str):
-    if not '```' in content:
-        return content
-    content = content.lstrip('```')
-    code = []
-    is_target = False
-    for line in content.splitlines():
-        if '```' in line:
-            if is_target:
-                break
-            else:
-                is_target = True
-                continue
-        if is_target:
-            code.append(line)
-    return '\n'.join(code)
+def extract_code(code: str):
+    if not '```' in code:
+        return code
+    start = code.find('```')
+    end = code.rfind('```')
+    ret = code[start:end]
+    ret = '\n'.join(ret.splitlines()[1:])
+    if not ret:
+        ret = code[start:]
+        ret = '\n'.join(ret.splitlines()[1:])
+    return ret
 
 def sample(llm, sampling_params, prompts, save_path):
     # Generate response in parallel and save in the target file.
@@ -66,7 +67,7 @@ def sample(llm, sampling_params, prompts, save_path):
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
             # print(prompt)
             # print(response)
-            data = {'instruction': prompt, 'response': '```python\n' +  response.strip() + '\n```'}
+            data = {'instruction': prompt, 'response': response}
             writer.write(data)
             results.append(data)
     return results
@@ -83,7 +84,7 @@ def main(
     use_beam_search: bool = False,
     best_of: int = 1,
     max_tokens: int = 2048,
-    stop: List[str] = ['```'],
+    stop: List[str] = ['```'], 
     batch_size: int = 512
 ):
     pid = int(current_process()._identity[0]) - 1
@@ -92,7 +93,7 @@ def main(
     save_path = f'{save_path}.{pid}'
 
     with lock:
-        llm = LLM(model=model_path, max_model_len=32800)
+        llm = LLM(model=model_path)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,
@@ -115,8 +116,8 @@ def main(
     prompts = []
     results = []
     for line in input_lines:
-        line = eval(line)
-        code = line['response']
+        line = json.loads(line)
+        code = '```python\n' + line['text'] + '\n```'
         # code = extract_code(code)
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:

@@ -92,7 +92,7 @@ def main(
     save_path = f'{save_path}.{pid}'
 
     with lock:
-        llm = LLM(model=model_path)
+        llm = LLM(model=model_path, max_model_len=32800)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,
