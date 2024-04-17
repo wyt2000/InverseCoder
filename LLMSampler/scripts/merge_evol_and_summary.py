@@ -1,8 +1,8 @@
 import jsonlines
 
-with open('magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.summary-0327') as f:
+with open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-evol-by-deepseek-coder-6.7b-instruct-summarized-by-deepseek-coder-6.7b-instruct') as f:
 	instructions = [eval(line)['response'].strip() for line in f.readlines()]
-with open('magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327') as f:
+with open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-evol-by-deepseek-coder-6.7b-instruct') as f:
 	responses = [eval(line)['response'].strip() for line in f.readlines()]
 
 def extract_code(code: str):
@@ -17,7 +17,7 @@ def extract_code(code: str):
         ret = '\n'.join(ret.splitlines()[1:])
     return ret
 
-with jsonlines.open('magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327.instruct', mode='w') as writer:
+with jsonlines.open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-instruct-by-deepseekcoder-6.7b-instruct', mode='w') as writer:
 	for inst, resp in zip(instructions, responses):
 		line = {
 			'instruction' : inst,

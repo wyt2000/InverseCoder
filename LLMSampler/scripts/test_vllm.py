@@ -8,17 +8,19 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 @@ Response
 {response}"""
 
-inst = '''Write a function to find the nth tetrahedral number. A tetrahedral number, or triangular pyramidal number, is a figurate number that represents a pyramid with a triangular base and three sides, called a tetrahedron. The nth tetrahedral number, Tn, is the sum of the first n triangular numbers, that is:
-Tn = n * (n + 1) * (n + 2) / 6
-Your code should satisfy the following assertion:
-```python
-assert tetrahedral_number(5) == 35
-```'''
+inst = '''Code Snippet:
+{code}
+Does the code is a response to a programming problem? Reply with only YES or NO.'''
+
+code1 = "from django.contrib import admin\nfrom .models import SearchResult\n\n# Register your models here.\nclass SearchResultAdmin(admin.ModelAdmin):\n    fields = [\"query\", \"heading\", \"url\", \"text\"]\n\nadmin.site.register(SearchResult, SearchResultAdmin)"
+
+code2 = "class Solution:\n    def finalPrices(self, prices: List[int]) -> List[int]:\n        res = []\n        for i in range(len(prices)):\n            for j in range(i+1,len(prices)):\n                if prices[j]<=prices[i]:\n                    res.append(prices[i]-prices[j])\n                    break\n                if j==len(prices)-1:\n                    res.append(prices[i])\n        res.append(prices[-1])\n        return res"
 
 prompts = [
-    MAGICODER_PROMPT.format(instruction=inst, response='```python\ndef tetrahedral_number(n):'),
+    MAGICODER_PROMPT.format(instruction=inst.format(code=code1), response='Answer: '),
+    MAGICODER_PROMPT.format(instruction=inst.format(code=code2), response='Answer: '),
 ]
-model_path = 'wizardcoder-gpt4-deduplicated-with-no-python-summary-only-by-python-model-0329/'
+model_path = '../model/wizardcoder-gpt4'
 sampling_params = SamplingParams(temperature=0, max_tokens=2048)
 llm = LLM(model=model_path)
 

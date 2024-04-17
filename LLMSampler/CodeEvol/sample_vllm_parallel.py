@@ -5,7 +5,6 @@ import argparse
 from typing import List
 from functools import partial
 
-from vllm import LLM, SamplingParams
 import fire
 import jsonlines
 import time
@@ -88,8 +87,10 @@ def main(
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(pid)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(pid) 
+    print(f'Using device {os.environ["CUDA_VISIBLE_DEVICES"]}')
     save_path = f'{save_path}.{pid}'
+    from vllm import LLM, SamplingParams
 
     with lock:
         llm = LLM(model=model_path, max_model_len=32800)
