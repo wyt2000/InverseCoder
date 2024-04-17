@@ -1,5 +1,5 @@
 # input_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.fixed.python.instruct-0324'
-input_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327.instruct'
+input_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327.instruct.syntax.invalid'
 
 with open(input_path) as f:
     for line in list(f.readlines())[0:10]:

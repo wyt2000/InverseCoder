@@ -2,12 +2,19 @@ import pyarrow.parquet as pq
 import jsonlines
 import json
 
-# for i in range(59):
-#    i = str(i).rjust(2, '0')
-with jsonlines.open(f'magicoder_data/humaneval-benchmark.jsonl', mode='w') as writer:
-    df = pq.read_table(f'magicoder_data/humaneval.parquet')
+def read_parquet(path):
+    df = pq.read_table(path)
     df = df.to_pandas()
     dataset = df.to_json(orient='records')
     dataset = json.loads(dataset)
+    return dataset
+
+dataset = []
+dataset.extend(read_parquet('magicoder_data/mbpp_data/prompt-00000-of-00001.parquet'))
+dataset.extend(read_parquet('magicoder_data/mbpp_data/test-00000-of-00001.parquet'))
+dataset.extend(read_parquet('magicoder_data/mbpp_data/train-00000-of-00001.parquet'))
+dataset.extend(read_parquet('magicoder_data/mbpp_data/validation-00000-of-00001.parquet'))
+
+with jsonlines.open(f'magicoder_data/mbpp-benchmark.jsonl', mode='w') as writer:
     for data in dataset:
         writer.write(data)

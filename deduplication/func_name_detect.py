@@ -2,9 +2,11 @@ import ast
 import jsonlines
 import tqdm
 from collections import Counter
+from eval_program import eval_program
 
 func_names = Counter()
 benchmark_data = []
+'''
 with open('magicoder_data/humaneval-benchmark.jsonl') as f:
     for line in f.readlines():
         line = eval(line)
@@ -13,6 +15,7 @@ with open('magicoder_data/humaneval-benchmark.jsonl') as f:
         for node in ast.walk(root):
             if isinstance(node, ast.FunctionDef):
                 func_names[node.name] = 0
+'''
 
 def _check_node(node):
     if not node.body:
@@ -44,9 +47,9 @@ def extract_code(code: str):
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl'
+data_path = 'magicoder_data/data-evol_instruct-decontaminated.jsonl.no_python.evol-0327'
 fixed_dataset = []
-with jsonlines.open(f'{data_path}.python', mode='w') as writer:
+with jsonlines.open(f'{data_path}.syntax.valid', mode='w') as writer:
     with open(data_path) as f:
         dataset = list(f.readlines())
         with tqdm.tqdm(total=len(dataset)) as pbar:
@@ -63,11 +66,14 @@ with jsonlines.open(f'{data_path}.python', mode='w') as writer:
                     if not code:
                         raise ValueError('Empty code!')
                     ast.parse(code)
+                    exc = eval_program(code)
+                    if exc:
+                        raise Exception('Runtime Error!')
                     writer.write(data)
                 except Exception as err:
-                    fixed_dataset.append(data)                    
+                    fixed_dataset.append(data)
                 pbar.update(1)
-with jsonlines.open(f'{data_path}.no_python', mode='w') as writer:
+with jsonlines.open(f'{data_path}.syntax.invalid', mode='w') as writer:
     for data in fixed_dataset:
         writer.write(data)
 
