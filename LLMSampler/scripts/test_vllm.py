@@ -8,19 +8,26 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 @@ Response
 {response}"""
 
-inst = '''Code Snippet:
-{code}
-Does the code is a response to a programming problem? Reply with only YES or NO.'''
+import json
+input_path = '/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code'
 
-code1 = "from django.contrib import admin\nfrom .models import SearchResult\n\n# Register your models here.\nclass SearchResultAdmin(admin.ModelAdmin):\n    fields = [\"query\", \"heading\", \"url\", \"text\"]\n\nadmin.site.register(SearchResult, SearchResultAdmin)"
+inst = '''Please rewrite the code in another way while keeping the functionality unchanged:
+{code}'''
 
-code2 = "class Solution:\n    def finalPrices(self, prices: List[int]) -> List[int]:\n        res = []\n        for i in range(len(prices)):\n            for j in range(i+1,len(prices)):\n                if prices[j]<=prices[i]:\n                    res.append(prices[i]-prices[j])\n                    break\n                if j==len(prices)-1:\n                    res.append(prices[i])\n        res.append(prices[-1])\n        return res"
+def get_language(response):
+    for line in response.splitlines():
+        if '```' in line:
+            return line.split('```')[1]
+    return ''
 
-prompts = [
-    MAGICODER_PROMPT.format(instruction=inst.format(code=code1), response='Answer: '),
-    MAGICODER_PROMPT.format(instruction=inst.format(code=code2), response='Answer: '),
-]
-model_path = '../model/wizardcoder-gpt4'
+prompts = []
+with open(input_path) as f:
+    for line in list(f.readlines())[:5]:
+        line = json.loads(line)
+        lang = get_language(line['response'])
+        prompts.append(MAGICODER_PROMPT.format(instruction=inst.format(code=line['response']), response='```'+lang))
+
+model_path = '../model/wizardcoder-gpt4-reproduce-0424'
 sampling_params = SamplingParams(temperature=0, max_tokens=2048)
 llm = LLM(model=model_path)
 

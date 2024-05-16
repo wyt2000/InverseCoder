@@ -26,9 +26,20 @@ There is a response code snippet to a programming problem, please recover the pr
 @@ Response
 {instruction}"""
 
+#MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.
+#
+#@@ Instruction
+#Please summarize the functionality of this code:
+#```python
+#{response}
+#```
+#
+#@@ Response
+#{instruction}"""
+
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    # prompt =  MAGICODER_PROMPT.format(instruction="", response=code)
+    # prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="", response=code)
     prompt =  MAGICODER_PROMPT_REVERSED.format(instruction="Problem Statement:\n", response=code)
     return prompt
 
@@ -47,10 +58,10 @@ def extract_code(code: str):
     start = code.find('```')
     end = code.rfind('```')
     ret = code[start:end]
-    ret = '\n'.join(ret.splitlines()[1:])
+    # ret = '\n'.join(ret.splitlines()[1:])
     if not ret:
         ret = code[start:]
-        ret = '\n'.join(ret.splitlines()[1:])
+        # ret = '\n'.join(ret.splitlines()[1:])
     return ret
 
 def sample(llm, sampling_params, prompts, save_path):
@@ -60,14 +71,15 @@ def sample(llm, sampling_params, prompts, save_path):
     with jsonlines.open(save_path, mode='a') as writer:
         for x in outputs:
             prompt = x.prompt.encode('utf-8', 'backslashreplace').decode('utf-8')
-            response = x.outputs[0].text
-            # response = extract_code(response)
-            response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
-            # print(prompt)
-            # print(response)
-            data = {'instruction': prompt, 'response': response}
-            writer.write(data)
-            results.append(data)
+            for output in x.outputs:
+                response = output.text
+                # response = extract_code(response)
+                response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
+                # print(prompt)
+                # print(response)
+                data = {'instruction': prompt, 'response': response}
+                writer.write(data)
+                results.append(data)
     return results
 
 def main(
@@ -80,10 +92,10 @@ def main(
     frequency_penalty: float = 0.0,
     repetition_penalty: float = 1.1,
     use_beam_search: bool = False,
-    best_of: int = 1,
+#    best_of: int = 1,
     max_tokens: int = 2048,
     stop: List[str] = ['```'], 
-    batch_size: int = 512
+    batch_size: int = 512 
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
@@ -92,7 +104,7 @@ def main(
 
     from vllm import LLM, SamplingParams
     with lock:
-        llm = LLM(model=model_path, max_model_len=32800)
+        llm = LLM(model=model_path)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,
@@ -101,7 +113,7 @@ def main(
         frequency_penalty=frequency_penalty,
         repetition_penalty=repetition_penalty,
         use_beam_search=use_beam_search,
-        best_of=best_of,
+#        best_of=best_of,
         stop=stop
     )
     
@@ -117,7 +129,7 @@ def main(
     for line in input_lines:
         line = eval(line)
         code = line['response']
-        # code = extract_code(code)
+        # code = extract_code(code) + '```'
         prompts.append(generate_one_prompt(code))
         if len(prompts) == batch_size:
             results.extend(generate_with_timer(prompts))

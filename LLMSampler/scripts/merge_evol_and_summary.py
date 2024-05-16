@@ -1,9 +1,10 @@
 import jsonlines
+import ast
 
-with open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-evol-by-deepseek-coder-6.7b-instruct-summarized-by-deepseek-coder-6.7b-instruct') as f:
-	instructions = [eval(line)['response'].strip() for line in f.readlines()]
-with open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-evol-by-deepseek-coder-6.7b-instruct') as f:
+with open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code') as f:
 	responses = [eval(line)['response'].strip() for line in f.readlines()]
+with open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code-summarized-by-wizardcoder-gpt4-reproduce-0424-0511') as f:
+	instructions = [eval(line)['response'].strip() for line in f.readlines()]
 
 def extract_code(code: str):
     if not '```' in code:
@@ -11,16 +12,19 @@ def extract_code(code: str):
     start = code.find('```')
     end = code.rfind('```')
     ret = code[start:end]
-    ret = '\n'.join(ret.splitlines()[1:])
+    # ret = '\n'.join(ret.splitlines()[1:])
     if not ret:
         ret = code[start:]
-        ret = '\n'.join(ret.splitlines()[1:])
+        # ret = '\n'.join(ret.splitlines()[1:])
     return ret
 
-with jsonlines.open('dataset/data-evol_instruct-decontaminated.jsonl.no_python-instruct-by-deepseekcoder-6.7b-instruct', mode='w') as writer:
-	for inst, resp in zip(instructions, responses):
-		line = {
-			'instruction' : inst,
-			'response' : resp
-		}
-		writer.write(line)
+with jsonlines.open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code-instructed-by-wizardcoder-gpt4-reproduce-0424-0511', mode='w') as writer:	
+    for inst, resp in zip(instructions, responses):
+        code = resp
+#        code = extract_code(resp)
+        line = {
+	    'instruction' : inst,
+#	    'response' : '```python\n' + code + '```'
+	    'response' : code 
+	}
+        writer.write(line)

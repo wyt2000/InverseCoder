@@ -17,8 +17,8 @@ def read_data(path):
             dataset.append(line)
     return dataset
 
-raw_dataset = read_data('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4')
-scored_dataset = read_data('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4-select-by-wizardcoder-gpt4-modified-prompt-0426')
+raw_dataset = read_data('dataset/data-evol_instruct-decontaminated.jsonl')
+scored_dataset = read_data('dataset/data-evol_instruct-decontaminated.jsonl-select-by-wizardcoder-gpt4-modified-prompt-0426')
 
 for x, y in zip(raw_dataset, scored_dataset):
     x['yes_prob'] = y['yes_prob']
@@ -49,7 +49,7 @@ dataset = sorted(raw_dataset, key=lambda x : x['yes_prob'])
 #    if all_print(code): continue
 #    target_dataset.append(data)
 
-with jsonlines.open('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4-select-by-wizardcoder-gpt4-modified-prompt-0426-sorted', mode='w') as writer:
+with jsonlines.open('dataset/data-evol_instruct-decontaminated.jsonl-select-by-wizardcoder-gpt4-modified-prompt-0426-sorted', mode='w') as writer:
     for data in dataset:
         writer.write(data)
 

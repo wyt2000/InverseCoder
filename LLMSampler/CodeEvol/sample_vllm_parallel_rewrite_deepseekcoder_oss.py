@@ -19,9 +19,9 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Please convert the following text snippet to a complete python code snippet:
-
-Text snippet for inspiration:
+    instruction = f'''Write a solution to the following coding problem:
+You are given a code snippet, please translate it to python.
+The code snippet:
 {code}
 '''
     prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```python\n")
@@ -83,7 +83,7 @@ def main(
     best_of: int = 1,
     max_tokens: int = 2048,
     stop: List[str] = ['```'],
-    batch_size: int = 512
+    batch_size: int = 16 
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
@@ -93,7 +93,7 @@ def main(
     from vllm import LLM, SamplingParams
 
     with lock:
-        llm = LLM(model=model_path)
+        llm = LLM(model=model_path, max_model_len=32800)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,

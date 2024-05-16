@@ -93,7 +93,7 @@ def main(
     from vllm import LLM, SamplingParams
 
     with lock:
-        llm = LLM(model=model_path)
+        llm = LLM(model=model_path, max_model_len=32800)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,

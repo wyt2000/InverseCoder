@@ -17,8 +17,8 @@ def read_data(path):
             dataset.append(line)
     return dataset
 
-raw_dataset = read_data('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4')
-scored_dataset = read_data('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4-select-by-wizardcoder-gpt4-modified-prompt-0426')
+raw_dataset = read_data('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst-instructed-by-starcoder2-instruct-reproduce')
+scored_dataset = read_data('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst-instructed-by-starcoder2-instruct-reproduce-select-by-starcoder2-instruct-reproduce')
 
 for x, y in zip(raw_dataset, scored_dataset):
     x['yes_prob'] = y['yes_prob']
@@ -41,16 +41,19 @@ def all_print(code):
             return False 
     return True
 
-dataset = sorted(raw_dataset, key=lambda x : x['yes_prob'])
-#target_dataset = []
-#for data in dataset[::-1]:
-#    if len(target_dataset) == 10000: break
-#    code = extract_code(data['response'])
-#    if all_print(code): continue
-#    target_dataset.append(data)
+# dataset = sorted(raw_dataset, key=lambda x : x['yes_prob'])
 
-with jsonlines.open('/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.python-instructed-by-wizardcoder-gpt4-select-by-wizardcoder-gpt4-modified-prompt-0426-sorted', mode='w') as writer:
-    for data in dataset:
+num_samples = 10
+
+result_dataset = []
+for i in range(0, len(raw_dataset), num_samples):
+    data = sorted(raw_dataset[i : i + num_samples], key=lambda x : -x['yes_prob'])[0]
+    result_dataset.append(data)
+result_dataset = sorted(result_dataset, key=lambda x : x['yes_prob'])
+
+with jsonlines.open('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst-instructed-by-starcoder2-instruct-reproduce-select-by-starcoder2-instruct-reproduce-with-score-sorted', mode='w') as writer:
+    for data in result_dataset:
         writer.write(data)
+
 
 

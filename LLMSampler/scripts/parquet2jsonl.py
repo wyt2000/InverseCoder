@@ -9,12 +9,13 @@ def read_parquet(path):
     dataset = json.loads(dataset)
     return dataset
 
+raw_dataset = read_parquet('/lustre/S/wuyt/dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.parquet')
 dataset = []
-dataset.extend(read_parquet('magicoder_data/mbpp_data/prompt-00000-of-00001.parquet'))
-dataset.extend(read_parquet('magicoder_data/mbpp_data/test-00000-of-00001.parquet'))
-dataset.extend(read_parquet('magicoder_data/mbpp_data/train-00000-of-00001.parquet'))
-dataset.extend(read_parquet('magicoder_data/mbpp_data/validation-00000-of-00001.parquet'))
 
-with jsonlines.open(f'magicoder_data/mbpp-benchmark.jsonl', mode='w') as writer:
+for data in raw_dataset:
+    dataset.append(data)
+    # dataset.append({'response' : data['content']})
+
+with jsonlines.open(f'/lustre/S/wuyt/dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl', mode='w') as writer:
     for data in dataset:
         writer.write(data)

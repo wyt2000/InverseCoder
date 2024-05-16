@@ -50,7 +50,7 @@ def generate_one_prompt(code):
 ```python
 {code}
 ```
-Does the code contain elements of mathematical intelligence? Reply with only YES or NO.'''
+Does the code contain elements of programming intelligence? Reply with only YES or NO.'''
     prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="")
     return prompt
 
