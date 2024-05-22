@@ -47,12 +47,13 @@ def get_yes_prob(probs, yes_tokens, no_tokens, token_ids):
 
 def generate_one_prompt(inst, code):
     # Fill prompt template with one code snippet.
-    instruction = f'''Here is a programming problem:
+    instruction = f'''Write a solution to the following coding problem:
+You are given a programming problem and a solution code, please decide whether the solution is correct.
 {inst}
-
-Here is the answer code to the problem:
+[Solution]
 {code}
-Is the answer correct? Your reply should begin with Yes or No.'''
+[Evaluation]
+Is the solution correct? Your reply should begin with Yes or No.'''
     prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="")
     return prompt
 
@@ -106,7 +107,7 @@ def main(
     max_tokens: int = 5,
     logprobs: int = 5,
     stop: List[str] = [],
-    batch_size: int = 512
+    batch_size: int = 512 
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')

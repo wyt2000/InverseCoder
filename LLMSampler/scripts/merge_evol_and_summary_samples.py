@@ -4,9 +4,9 @@ import ast
 def redecode(s):
     return s.encode('utf-8', 'backslashreplace').decode('utf-8')
 
-with open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl-generated-by-wizardcoder-gpt4-reproduce-0424') as f:
+with open('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst') as f:
 	responses = [redecode(eval(line)['response'].strip()) for line in f.readlines()]
-with open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl') as f:
+with open('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst-summarized-by-starcoder2-instruct-reproduce-humaneval') as f:
 	instructions = [redecode(eval(line)['response'].strip()) for line in f.readlines()]
 
 def extract_code(code: str):
@@ -23,7 +23,7 @@ def extract_code(code: str):
 
 num_samples = 10
 
-with jsonlines.open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl-generated-by-wizardcoder-gpt4-reproduce-0424-resampled-0516', mode='w') as writer:	
+with jsonlines.open('dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl.code.with.inst-instructed-by-starcoder2-instruct-reproduce-humaneval', mode='w') as writer:
     for i, inst in enumerate(instructions):
         j = i // num_samples
         line = {

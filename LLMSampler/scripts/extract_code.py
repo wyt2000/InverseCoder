@@ -41,10 +41,10 @@ def redecode(s):
 
 
 bad_codes = []
-path = 'dataset/starcoderdata/self-oss-instruct-sc2-exec-filter-50k.jsonl'
+path = 'dataset/evol-instruct-gpt4-scaling/evol-instruct-gpt4-sample-75k.jsonl'
 with open(path) as f:
     lines = list(f.readlines())
-    with jsonlines.open(f'{path}.code.with.inst', mode='w') as writer:
+    with jsonlines.open(f'{path}.code', mode='w') as writer:
         for line in lines:
             line = eval(line)
             inst = redecode(line['instruction'])

@@ -6,13 +6,11 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 {instruction}
 
 @@ Response
-{response}"""
+"""
 
 import json
-input_path = '/lustre/S/wuyt/dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code'
 
-inst = '''Please rewrite the code in another way while keeping the functionality unchanged:
-{code}'''
+inst = '''Please check if the network can connect to `www.example.com` using Python.'''
 
 def get_language(response):
     for line in response.splitlines():
@@ -21,19 +19,16 @@ def get_language(response):
     return ''
 
 prompts = []
-with open(input_path) as f:
-    for line in list(f.readlines())[:5]:
-        line = json.loads(line)
-        lang = get_language(line['response'])
-        prompts.append(MAGICODER_PROMPT.format(instruction=inst.format(code=line['response']), response='```'+lang))
+prompts.append(MAGICODER_PROMPT.format(instruction=MAGICODER_PROMPT.format(instruction=inst)))
 
-model_path = '../model/wizardcoder-gpt4-reproduce-0424'
+model_path = '../model/inversecoder-DS-0510'
 sampling_params = SamplingParams(temperature=0, max_tokens=2048)
-llm = LLM(model=model_path)
+llm = LLM(model=model_path, max_model_len=32800)
 
 outputs = llm.generate(prompts, sampling_params)
 # Print the outputs.
 for output in outputs:
     prompt = output.prompt
     generated_text = output.outputs[0].text
-    print(f"Prompt: {prompt!r}, Generated text: {generated_text!r}")
+    print(prompt)
+    print(generated_text)

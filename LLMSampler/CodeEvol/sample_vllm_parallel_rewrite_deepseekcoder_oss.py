@@ -20,11 +20,11 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 def generate_one_prompt(code):
     # Fill prompt template with one code snippet.
     instruction = f'''Write a solution to the following coding problem:
-You are given a code snippet, please translate it to python.
+Give a completely new code snippet in the same domain of the following code snippet with different functionality.
 The code snippet:
 {code}
 '''
-    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```python\n")
+    prompt =  MAGICODER_PROMPT.format(instruction=instruction, response="```")
     return prompt
 
 def generate_prompts(input_path):
@@ -65,7 +65,7 @@ def sample(llm, sampling_params, prompts, save_path):
             response = response.encode('utf-8', 'backslashreplace').decode('utf-8')
             # print(prompt)
             # print(response)
-            data = {'instruction': prompt, 'response': '```python\n' +  response.strip() + '\n```'}
+            data = {'instruction': prompt, 'response': '```' +  response.strip() + '\n```'}
             writer.write(data)
             results.append(data)
     return results
@@ -83,7 +83,7 @@ def main(
     best_of: int = 1,
     max_tokens: int = 2048,
     stop: List[str] = ['```'],
-    batch_size: int = 16 
+    batch_size: int = 512 
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')

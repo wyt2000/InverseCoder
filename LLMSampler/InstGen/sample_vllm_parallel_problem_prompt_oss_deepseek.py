@@ -26,7 +26,6 @@ MAGICODER_PROMPT_REVERSED = """You are an exceptionally intelligent coding assis
 Write a solution to the following coding problem:
 You are given a response code snippet to a programming problem, please give the problem description:
 {response}
-You should also provide with a code snippet as a starting point for the problem.
 
 @@ Response
 {instruction}"""
@@ -116,8 +115,8 @@ def main(
     use_beam_search: bool = False,
 #    best_of: int = 1,
     max_tokens: int = 2048,
-    stop: List[str] = [], 
-#    stop: List[str] = ['```'], 
+#    stop: List[str] = [], 
+    stop: List[str] = ['```'], 
 #    stop: List[str] = [' Here', '\nHere'], 
     batch_size: int = 16 
 ):
