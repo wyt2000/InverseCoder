@@ -6,16 +6,58 @@
 
 <img src="https://github.com/wyt2000/InverseCoder/blob/main/assets/overview.png" style="zoom:50%;" /> 
 
-InverseCoder is a series of code LLMs instruction-tuned by generating data from itself through Inverse-Instruct.
+InverseCoder is a series of code LLMs instruction-tuned by generating data from itself through Inverse-Instruct. This repo (under development) mainly contains the code for data generation (i.e. Inverse-Instruct). 
 
-## Models and Datasets
-|     | Base Model                                                                                           | InverseCoder                                                                                      | Dataset                                                                                                                              |
-| --- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 6.7B | [deepseek-ai/deepseek-coder-6.7b-base](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-base) | [wyt2000/InverseCoder-DS-6.7B](https://huggingface.co/wyt2000/InverseCoder-DS-6.7B)               | [wyt2000/InverseCoder-DS-6.7B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-DS-6.7B-Evol-Instruct-90K)     |
-| 7B  | [codellama/CodeLlama-7b-Python-hf](https://huggingface.co/codellama/CodeLlama-7b-Python-hf)          | [wyt2000/InverseCoder-CL-7B](https://huggingface.co/wyt2000/InverseCoder-CL-7B) | [wyt2000/InverseCoder-CL-7B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-CL-7B-Evol-Instruct-90K)       |
-| 13B  | [codellama/CodeLlama-13b-Python-hf](https://huggingface.co/codellama/CodeLlama-13b-Python-hf)          | [wyt2000/InverseCoder-CL-13B](https://huggingface.co/wyt2000/InverseCoder-CL-13B)  | [wyt2000/InverseCoder-CL-13B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-CL-13B-Evol-Instruct-90K)       |
 
-## Usage
+## Data Generation
+
+### Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step1: Code Preprocessing
+Specify the path of datasets, then extract code snippets:
+
+```python
+python src/scripts/extract_code.py
+```
+
+### Step2: Code Summarization
+
+Use vllm to generate instructions from code snippets:
+```python
+python src/InstGen/sample_vllm_parallel_problem_prompt_evol.py \
+    --model_path=$model_path \
+    --input_path=$input_path \
+    --save_path=$save_path \
+    --num_gpus 8
+```
+Then combine sampled instructions and code:
+```
+python src/scripts/merge_evol_and_summary_samples.py
+```
+
+### Step3: Self-evaluation and Data Selection
+Use vllm to generate evaluations and calculate LM-scores:
+```python
+python src/SelectData/sample_vllm_parallel_inst_pair.py \
+    --model_path=$model_path \
+    --input_path=$input_path \
+    --save_path=$save_path \
+    --num_gpus 8 
+```
+Then select the best instruction for each response to obtain the new dataset:
+```
+python src/scripts/sorted_data_samples.py
+```
+
+## Training
+
+We first fine-tune the base models on synthetic data generated through INVERSE-INSTRUCT for 1 epoch, then we continue to fine-tune the models with the original instruction tuning dataset for 2 epochs to obtain InverseCoder models. We use the same hyper-parameter and prompt settings as [Magicoder](https://github.com/ise-uiuc/magicoder) for comparison.
+
+## Inference
 
 Similar to [Magicoder-S-DS-6.7B](https://huggingface.co/ise-uiuc/Magicoder-S-DS-6.7B/), use the code below to get started with the model. Make sure you installed the [transformers](https://huggingface.co/docs/transformers/index) library.
 
@@ -38,6 +80,13 @@ generator = pipeline(
 result = generator(prompt, max_length=1024, num_return_sequences=1, temperature=0.0)
 print(result[0]["generated_text"])
 ```
+
+## Models and Datasets
+|     | Base Model                                                                                           | InverseCoder                                                                                      | Dataset                                                                                                                              |
+| --- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 6.7B | [deepseek-ai/deepseek-coder-6.7b-base](https://huggingface.co/deepseek-ai/deepseek-coder-6.7b-base) | [wyt2000/InverseCoder-DS-6.7B](https://huggingface.co/wyt2000/InverseCoder-DS-6.7B)               | [wyt2000/InverseCoder-DS-6.7B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-DS-6.7B-Evol-Instruct-90K)     |
+| 7B  | [codellama/CodeLlama-7b-Python-hf](https://huggingface.co/codellama/CodeLlama-7b-Python-hf)          | [wyt2000/InverseCoder-CL-7B](https://huggingface.co/wyt2000/InverseCoder-CL-7B) | [wyt2000/InverseCoder-CL-7B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-CL-7B-Evol-Instruct-90K)       |
+| 13B  | [codellama/CodeLlama-13b-Python-hf](https://huggingface.co/codellama/CodeLlama-13b-Python-hf)          | [wyt2000/InverseCoder-CL-13B](https://huggingface.co/wyt2000/InverseCoder-CL-13B)  | [wyt2000/InverseCoder-CL-13B-Evol-Instruct-90K](https://huggingface.co/datasets/wyt2000/InverseCoder-CL-13B-Evol-Instruct-90K)       |
 
 ## Paper
 **Arxiv:** <https://arxiv.org/abs/2407.05700>
