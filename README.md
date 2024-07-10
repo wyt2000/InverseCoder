@@ -91,7 +91,7 @@ print(result[0]["generated_text"])
 ## Paper
 **Arxiv:** <https://arxiv.org/abs/2407.05700>
 
-Please cite the paper if you use the models or datasets from InverseCoder.
+Please cite the paper if you use the code, models or datasets from InverseCoder.
 
 ```
 @misc{wu2024inversecoderunleashingpowerinstructiontuned,
