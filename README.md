@@ -6,7 +6,7 @@
 
 <img src="https://github.com/wyt2000/InverseCoder/blob/main/assets/overview.png" style="zoom:50%;" /> 
 
-InverseCoder is a series of code LLMs instruction-tuned by generating data from itself through Inverse-Instruct. This repo (under development) mainly contains the code for data generation (i.e. Inverse-Instruct). 
+InverseCoder is a series of code LLMs instruction-tuned by generating data from itself through Inverse-Instruct. This repo **(under development)** mainly contains the code for data generation (i.e. Inverse-Instruct). 
 
 
 ## Data Generation
@@ -55,7 +55,7 @@ python src/scripts/sorted_data_samples.py
 
 ## Training
 
-We first fine-tune the base models on synthetic data generated through INVERSE-INSTRUCT for 1 epoch, then we continue to fine-tune the models with the original instruction tuning dataset for 2 epochs to obtain InverseCoder models. We use the same hyper-parameter and prompt settings as [Magicoder](https://github.com/ise-uiuc/magicoder) for comparison.
+We first fine-tune the base models on synthetic data generated through Inverse-Instruct for 1 epoch, then we continue to fine-tune the models with the original instruction tuning dataset for 2 epochs to obtain InverseCoder models. We use the same hyper-parameter and prompt settings as [Magicoder](https://github.com/ise-uiuc/magicoder) for comparison.
 
 ## Inference
 
