@@ -118,7 +118,7 @@ def main(
 #    stop: List[str] = [], 
     stop: List[str] = ['```'], 
 #    stop: List[str] = [' Here', '\nHere'], 
-    batch_size: int = 16 
+    batch_size: int = 512 
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')

@@ -17,8 +17,8 @@ def read_data(path):
             dataset.append(line)
     return dataset
 
-raw_dataset = read_data('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl-generated-by-wizardcoder-gpt4-deepseekbase-0510-shiwenxuan-resampled-0522')
-scored_dataset = read_data('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl-generated-by-wizardcoder-gpt4-deepseekbase-0510-shiwenxuan-resampled-0522-select-by-wizardcoder-gpt4-deepseekbase-0510-shiwenxuan')
+raw_dataset = read_data('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code-instructed-by-wizardcoder-gpt4-QW-8x40g-0611')
+scored_dataset = read_data('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code-instructed-by-wizardcoder-gpt4-QW-8x40g-0611-select-by-wizardcoder-gpt4-QW-8x40g-0611')
 
 for x, y in zip(raw_dataset, scored_dataset):
     x['yes_prob'] = y['yes_prob']
@@ -51,7 +51,7 @@ for i in range(0, len(raw_dataset), num_samples):
     result_dataset.append(data)
 result_dataset = sorted(result_dataset, key=lambda x : x['yes_prob'])
 
-with jsonlines.open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl-generated-by-wizardcoder-gpt4-deepseekbase-0510-shiwenxuan-resampled-0522-select-by-wizardcoder-gpt4-deepseekbase-0510-shiwenxuan-with-score-sorted', mode='w') as writer:
+with jsonlines.open('dataset/evol-instruct-gpt4/data-evol_instruct-decontaminated.jsonl.code-instructed-by-wizardcoder-gpt4-QW-8x40g-0611-select-by-wizardcoder-gpt4-QW-8x40g-0611-with-score-sorted', mode='w') as writer:
     for data in result_dataset:
         writer.write(data)
 

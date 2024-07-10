@@ -24,8 +24,9 @@ MAGICODER_PROMPT = """You are an exceptionally intelligent coding assistant that
 def get_token_ids(model_path, tokens):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     tokenizer = AutoTokenizer.from_pretrained(model_path)
+    # print(tokenizer(token, return_tensors='pt')['input_ids'])
     token_ids = {
-        token : tokenizer(token, return_tensors='pt')['input_ids'][0][1].item()
+        token : tokenizer(token, return_tensors='pt')['input_ids'][0][0].item()
         for token in tokens
     }
     return token_ids
@@ -115,8 +116,7 @@ def main(
     from vllm import LLM, SamplingParams
 
     with lock:
-        llm = LLM(model=model_path, max_model_len=11792)
-        # llm = LLM(model=model_path)
+        llm = LLM(model=model_path)
     sampling_params = SamplingParams(
         n=num_samples,
         temperature=temperature,

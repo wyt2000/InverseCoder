@@ -120,12 +120,14 @@ def main(
 ):
     pid = int(current_process()._identity[0]) - 1
     print(f'[Parallel] pid: {pid}, data size: {len(input_lines)}')
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(pid)
+    os.environ["CUDA_VISIBLE_DEVICES"] = f'{pid}'
+    # os.environ["CUDA_VISIBLE_DEVICES"] = f'{2*pid}, {2*pid+1}'
     save_path = f'{save_path}.{pid}'
 
     from vllm import LLM, SamplingParams
     with lock:
-        llm = LLM(model=model_path, max_model_len=11792)
+    #    llm = LLM(model=model_path, max_model_len=11792)
+        llm = LLM(model=model_path)
     sampling_params = SamplingParams(
         n=1,
         temperature=temperature,
